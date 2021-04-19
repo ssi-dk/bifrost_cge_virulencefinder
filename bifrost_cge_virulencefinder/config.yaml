@@ -1,0 +1,69 @@
+#-Basic info----------------------------------------------------------------------------------------
+display_name: cge_virulencefinder
+name: &name cge_virulencefinder__v2_0_0__0479a98
+version:
+  schema: ["v2_1_0"]
+  code: v2_0_0
+#---------------------------------------------------------------------------------------------------
+
+#-Details-------------------------------------------------------------------------------------------
+details:
+  target: [sample]
+  description: >
+    todo
+#---------------------------------------------------------------------------------------------------
+
+#-Category info-------------------------------------------------------------------------------------
+category: [virulence]
+#---------------------------------------------------------------------------------------------------
+
+#-Install-------------------------------------------------------------------------------------------
+install:
+  path: # Set by install program
+  dockerfile: docker://ssidk/bifrost_cge_virulencefinder
+#---------------------------------------------------------------------------------------------------
+
+#-Options-------------------------------------------------------------------------------------------
+options:
+#---------------------------------------------------------------------------------------------------
+
+#-Required resource files---------------------------------------------------------------------------
+resources:
+  database_path: "/bifrost/components/bifrost_cge_virulencefinder/resources/virulencefinder_db"
+#---------------------------------------------------------------------------------------------------
+
+#-Requirements to run component---------------------------------------------------------------------
+requirements:
+  sample:
+    categories:
+      paired_reads:
+        summary:
+          data:
+#---------------------------------------------------------------------------------------------------
+
+#-DB Value changes (excluding component output)-----------------------------------------------------
+db_values_changes:
+  files: []
+  sample:
+    categories:
+      virulence:
+        summary:  # see sample_component summary
+        component:
+          _id: 
+          date:  # ObjectId
+    report:
+      resistance:
+        title: "virulence"
+        info: *name
+        columns: 
+          - {id: "gene", name: "gene"}
+          - {id: "coverage", name: "%cov"}
+          - {id: "identity", name: "%id"}
+          - {id: "variants", name: "# of variants"}
+        data: []
+  sample_component:
+    summary:
+    results:
+      cge_virulencefinder/data_yaml: {}
+
+#---------------------------------------------------------------------------------------------------
