@@ -87,7 +87,7 @@ rule cge_virulencefinder:
         f"{component['name']}/benchmarks/{rule_name}.benchmark"
     input:
         check_file = rules.check_requirements.output.check_file,
-        folder = rules.setup.output.init_file,
+        #folder = rules.setup.output.init_file,
         reads = sample['categories']['paired_reads']['summary']['data']
     output:
         virulencefinder_results = directory(f"{component['name']}/virulencefinder_results")
@@ -95,7 +95,7 @@ rule cge_virulencefinder:
         samplecomponent_ref_json = samplecomponent.to_reference().json,
         database = component["resources"]["database_path"]
     shell:
-        "python virulencefinder.py -i {input.reads[0]} {input.reads[1]} -o {output.virulencefinder_results} -mp kma -p {params.database}"
+        "mkdir {output.virulencefinder_results} && virulencefinder.py -i {input.reads[0]} {input.reads[1]} -o {output.virulencefinder_results} -mp kma -p {params.database}"
     #script:
         #os.path.join(os.path.dirname(workflow.snakefile), "rule__cge_virulencefinder.py")
 #* Dynamic section: end ****************************************************************************
@@ -112,7 +112,7 @@ rule datadump:
         f"{component['name']}/benchmarks/{rule_name}.benchmark"
     input:
         #* Dynamic section: start ******************************************************************
-        rules.cge_virulencefinder.output.complete  # Needs to be output of final rule
+        rules.cge_virulencefinder.output.virulencefinder_results  # Needs to be output of final rule
         #* Dynamic section: end ********************************************************************
     output:
         complete = rules.all.input

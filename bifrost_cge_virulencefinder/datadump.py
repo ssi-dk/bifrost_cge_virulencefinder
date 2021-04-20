@@ -6,49 +6,50 @@ from bifrostlib.datahandling import Component
 from bifrostlib.datahandling import Category
 from typing import Dict
 import os
+import json
 
-def extract_mlst(mlst: Category, results: Dict, component_name: str, species) -> None:
-    file_name = "data.yaml"
+def extract_virulence(virulence: Category, results: Dict, component_name: str) -> None:
+    file_name = "virulencefinder_results/data.json"
     file_key = common.json_key_cleaner(file_name)
     file_path = os.path.join(component_name, file_name)
-    mlst_yaml = common.get_yaml(file_path)
-    results[file_key] = {}
-    for subspec in species:
-        mlst_results = mlst_yaml[subspec]['mlst']['results']
-        mlst_run_info = mlst_yaml[subspec]['mlst']['run_info']
-        mlst_user_input = mlst_yaml[subspec]['mlst']['user_input']
-        sequence_type = mlst_results['sequence_type']
-        mlst['summary']['sequence_type'].append(sequence_type) # maybe extend the string with subspec
-        alleles = ", ".join(list(mlst_results['allele_profile'].keys()))
-        mlst['report']['data'].append({
-            "db":subspec,
-            "sequence_type":sequence_type,
-            "alleles":alleles
-        })
-    results[file_key]['sequence_type'] = mlst['summary']['sequence_type']
+    with open(file_path) as input:
+        results_json = json.load(input)
+    virulence_results = results_json['virulencefinder']['results']
+    for species in virulence_results.keys():
+        print(species)
+        for gene_type in virulence_results[species].keys():
+            if virulence_results[species][gene_type] == "No hit found":
+                continue
+            for gene in virulence_results[species][gene_type].keys():
+                name = virulence_results[species][gene_type][gene]['virulence_gene']
+                protein_function = virulence_results[species][gene_type][gene]['protein_function']
+                coverage = virulence_results[species][gene_type][gene]['coverage']
+                identity = virulence_results[species][gene_type][gene]['identity']
+                variants = None # not implemented
+                summary_dict = {'gene':name, 'protein_function':protein_function}
+                report_dict = {'gene':name, 'coverage':coverage, 'identity':identity, 'variants':variants}
+                virulence['summary']['virulence_genes'].append(summary_dict)
+                virulence['report']['data'].append(report_dict)
+    results[file_key]={}
+    results[file_key]['virulence_genes'] = virulence['summary']['virulence_genes']
 
 def datadump(samplecomponent_ref_json: Dict):
     samplecomponent_ref = SampleComponentReference(value=samplecomponent_ref_json)
     samplecomponent = SampleComponent.load(samplecomponent_ref)
     sample = Sample.load(samplecomponent.sample)
-    component = Component.load(samplecomponent.component)
     
-    species_detection = sample.get_category("species_detection")
-    species = species_detection["summary"].get("species", None)
-    mlst_species = component["options"]["mlst_species_mapping"][species]
-
-    mlst = samplecomponent.get_category("mlst")
-    if mlst is None:
-        mlst = Category(value={
-                "name": "mlst",
+    virulence = samplecomponent.get_category("virulence")
+    if virulence is None:
+        virulence = Category(value={
+                "name": "virulence",
                 "component": {"id": samplecomponent["component"]["_id"], "name": samplecomponent["component"]["name"]},
-                "summary": {"sequence_type":[]},
+                "summary": {'virulence_genes':[]},
                 "report": {"data":[]}
             }
         )
-    extract_mlst(mlst, samplecomponent["results"], samplecomponent["component"]["name"], mlst_species)
-    samplecomponent.set_category(mlst)
-    sample.set_category(mlst)
+    extract_virulence(virulence, samplecomponent["results"], samplecomponent["component"]["name"])
+    samplecomponent.set_category(virulence)
+    sample.set_category(virulence)
     common.set_status_and_save(sample, samplecomponent, "Success")
     
     with open(os.path.join(samplecomponent["component"]["name"], "datadump_complete"), "w+") as fh:
