@@ -1,9 +1,9 @@
 #-Basic info----------------------------------------------------------------------------------------
 display_name: cge_virulencefinder
-name: &name cge_virulencefinder__v2_0_0__0479a98
+name: &name cge_virulencefinder__v2_0_1__0479a98
 version:
   schema: ["v2_1_0"]
-  code: v2_0_0
+  code: v2_0_1
   resource: "0479a98"
 #---------------------------------------------------------------------------------------------------
 
