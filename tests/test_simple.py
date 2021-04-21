@@ -22,7 +22,7 @@ def test_connection():
 
 
 class TestCGEVirulencefinder:
-    component_name = "cge_virulencefinder__v2_0_0"
+    component_name = "cge_virulencefinder__v2_0_1"
     component_name = component_name + "__0479a98"
     current_dir = os.getcwd()
     test_dir = "/bifrost/test_data/output/test__cge_virulencefinder/"

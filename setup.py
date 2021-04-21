@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='bifrost_cge_virulencefinder',
-    version='v2_0_0',
+    version='v2_0_1',
     url='https://github.com/ssi-dk/bifrost_cge_virulencefinder',
 
     # Author details
